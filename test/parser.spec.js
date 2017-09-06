@@ -81,9 +81,9 @@ describe ('parser spec', function() {
             should(parser.parse('1/2 + (5.5 + 4.7) * 5.1')).equal(52.52);
         });
 
-        // it('should return -52.52 for -1/2 + (-5.5 - 4.7) * 5.1', function() {
-        //     should(parser.parse('-1/2 + (-5.5 - 4.7) * 5.1')).equal(-52.52);
-        // });
+        it('should return -52.52 for -1/2 + (-5.5 - 4.7) * 5.1', function() {
+            should(parser.parse('-1/2 + (-5.5 - 4.7) * 5.1')).equal(-52.52);
+        });
 
         it('should return 1.67 for 1+2/3', function() {
             should(parser.parse('1+2/3')).equal(1.67);

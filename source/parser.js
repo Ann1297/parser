@@ -1,4 +1,4 @@
-var parser = (function() {
+var parser = (function () {
     function parse(s) {
         s = s.replace(/\s/g, '');
 
@@ -6,17 +6,23 @@ var parser = (function() {
             return undefined;
         }
 
-        while(isNaN(s)) {
-            var expression;  
+        while (isNaN(s)) {
+            var expression;
 
             if (containsBrackects(s)) {
                 expression = getExpressionFromBrackects(s);
             } else {
                 expression = getExpressionForOperation(s);
             }
-
-            var sign = getSign(expression);
-            s = s.replace(expression, operation(expression, sign));                    
+            console.log('expression');
+            console.log(expression);
+            console.log('s');
+            console.log(s);
+            var signIndex = getSignIndex(expression);
+            console.log('signIndex');
+            console.log(signIndex);
+            console.log('----------------------');
+            s = s.replace(expression, operation(expression, signIndex));
         }
 
         return +(+s).toFixed(2);
@@ -49,88 +55,102 @@ var parser = (function() {
     }
 
     function getExpressionFromBrackects(s) {
-        var fromBackets = s.match(/\(-*\d+.*\d*[\+\-\*\/]*\d+.*\d*\)/);
+        var fromBackets = s.match(/\(-*\d+\.*\d*[\+\-\*\/]*\d+\.*\d*\)/);
         return fromBackets[0];
     }
 
     //complicated function -__-
     function getExpressionForOperation(s) {
 
-        // var indexOfSign = s.match(/-*\d+.*\d*[\*\/]-*\d+.*\d*/);
-        // var indexOfPlus = s.match(/-*\d+.*\d*[\+]-*\d+.*\d*/);
-        // var indexOfMinus = s.match(/-*\d+.*\d*[\-]-*\d+.*\d*/) || [];
+        var indexOfSign = s.match(/\-?\d+\.?\d*[\*\/]\-?\d+\.?\d*/) || [];
+        var indexOfPlus = s.match(/\-?\d+\.?\d*[\+]\-?\d+\.?\d*/) || [];
+        var indexOfMinus = s.match(/\-?\d+\.?\d*[\-]\-?\d+\.?\d*/) || [];
 
-        var indexOfSign = s.search(/[\*\/]/);
-        var indexOfPlus = s.search(/[\+]/);
-        var indexOfMinus = s.search(/[\-]/);
-
-        if (indexOfSign === -1) {
-            indexOfSign = indexOfPlus !== -1 ? indexOfPlus : indexOfMinus;
+        if (indexOfSign.length !== 0) {
+            return indexOfSign[0];
+        } else if (indexOfPlus.length !== 0) {
+            return indexOfPlus[0];
+        } else if (indexOfMinus !== 0) {
+            return indexOfMinus[0];
         }
 
-        if (indexOfSign != -1) {
-            var startIndex = 0, endIndex = s.length;
-            
-            for (var i = indexOfSign - 1; i >= 0; i--) {
-                var letter = s.charAt(i);
-                if (isNaN(letter) && letter !== ".") {
-                    startIndex = i + 1;
-                    break;
-                }
-            }
-
-            for (var i = indexOfSign + 1; i < s.length; i++) {
-                var letter = s.charAt(i);
-                if (isNaN(letter) && letter !== ".") {
-                    endIndex = i;
-                    break;
-                }
-            }
-
-            return s.substring(startIndex, endIndex);
-        }
         return s;
     }
 
-    function getSign(expression) {
-        if (expression.search(/\+/) != -1) {
-            return '+';
+    function getSignIndex(expression) {
+        
+        var signs = ['*', '/', '+', '-'];
+        for (var i = 0; i < signs.length; i++) {
+            var signIndex = expression.lastIndexOf(signs[i]);
+            if (signIndex !== -1) {
+                return signIndex;
+            }
         }
+        
+        
 
-        if (expression.search(/-/) != -1) {
-            return '-';
-        }
+        // var regsForSigns = [/\d+\*\d+/ , /\d+\/\d+/ , /\d+\+\d+/ , /\d+\-\d+/]
+        
+        // for (var i = 0; i < regsForSigns.length; i++) {
+        //     var match = expression.match(regsForSigns[i]) || [];
+        //     if (match.length > 0) {
+                
+        //         return index;
+        //     }
+        // }
+        
+        
+        // .forEach(function (value) {
+        //     var index = expression.search(value);
+        //     if (index != -1) {
+        //         return index;
+        //     }
+        // });
+    
 
-        if (expression.search(/\*/) != -1) {
-            return '*';
-        }
+        // if (expression.search(/\d+\*\d+/) != -1) {
+        //     return expression.search(/\d+\*\d+/);
+        // }
 
-        if (expression.search(/\//) != -1) {
-            return '/';
-        }
+        // if (expression.search(/\d+\/\d+/) != -1) {
+        //     return expression.search(/\d+\/\d+/);
+        // }
+        // if (expression.search(/\d+\+\d+/) != -1) {
+        //     return expression.search(/\d+\+\d+/);
+        // }
+
+        // if (expression.search(/\d+\-\d+/) != -1) {
+        //     return expression.search(/\d+\-\d+/);
+        // }
     }
 
-    function operation(expression, sign) {
+    function operation(expression, signIndex) { 
+        var sign = expression[signIndex];
         if (containsBrackects(expression)) {
             expression = expression.substring(1, expression.length - 1);
+            signIndex = expression.lastIndexOf(sign);
         }
-        var numbers = expression.split(sign);
+        var x = +(expression.substring(0, signIndex));
+        var y = +(expression.substring(signIndex + 1, expression.length));
+        console.log(x);
+        console.log(y);
+        console.log(expression);
         switch (sign) {
             case '+':
-            return +numbers[0] + +numbers[1];
-            break;
+                return x + y;
+                break;
             case '-':
-            return +numbers[0] - +numbers[1];
-            break;
-            case '*':            
-            return +numbers[0] * +numbers[1];
-            break;
-            case '/':            
-            return +numbers[0] / +numbers[1];
-            break;
+                return x - y;
+                break;
+            case '*':
+                return x * y;
+                break;
+            case '/':
+                return x / y;
+                break;
             default:
-            return expression;
-            break;
+                return expression;
+                break;
         }
     }
 
