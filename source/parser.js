@@ -14,14 +14,7 @@ var parser = (function () {
             } else {
                 expression = getExpressionForOperation(s);
             }
-            console.log('expression');
-            console.log(expression);
-            console.log('s');
-            console.log(s);
             var signIndex = getSignIndex(expression);
-            console.log('signIndex');
-            console.log(signIndex);
-            console.log('----------------------');
             s = s.replace(expression, operation(expression, signIndex));
         }
 
@@ -86,42 +79,6 @@ var parser = (function () {
                 return signIndex;
             }
         }
-        
-        
-
-        // var regsForSigns = [/\d+\*\d+/ , /\d+\/\d+/ , /\d+\+\d+/ , /\d+\-\d+/]
-        
-        // for (var i = 0; i < regsForSigns.length; i++) {
-        //     var match = expression.match(regsForSigns[i]) || [];
-        //     if (match.length > 0) {
-                
-        //         return index;
-        //     }
-        // }
-        
-        
-        // .forEach(function (value) {
-        //     var index = expression.search(value);
-        //     if (index != -1) {
-        //         return index;
-        //     }
-        // });
-    
-
-        // if (expression.search(/\d+\*\d+/) != -1) {
-        //     return expression.search(/\d+\*\d+/);
-        // }
-
-        // if (expression.search(/\d+\/\d+/) != -1) {
-        //     return expression.search(/\d+\/\d+/);
-        // }
-        // if (expression.search(/\d+\+\d+/) != -1) {
-        //     return expression.search(/\d+\+\d+/);
-        // }
-
-        // if (expression.search(/\d+\-\d+/) != -1) {
-        //     return expression.search(/\d+\-\d+/);
-        // }
     }
 
     function operation(expression, signIndex) { 
@@ -132,9 +89,7 @@ var parser = (function () {
         }
         var x = +(expression.substring(0, signIndex));
         var y = +(expression.substring(signIndex + 1, expression.length));
-        console.log(x);
-        console.log(y);
-        console.log(expression);
+        
         switch (sign) {
             case '+':
                 return x + y;
