@@ -1,4 +1,4 @@
-https://travis-ci.org/Ann1297/parser.svg?branch=master
+![Travis CI status](https://travis-ci.org/Ann1297/parser.svg?branch=master)
 
 # parser
 
