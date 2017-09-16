@@ -7,34 +7,42 @@ var parser = (function () {
         }
 
         while (isNaN(s)) {
-            var expression;
-
-            if (containsBrackects(s)) {
-                expression = getExpressionFromBrackects(s);
-            } else {
-                expression = getExpressionForOperation(s);
-            }
-
-            s = s.replace(expression, operation(expression));
+            var expression = getExpressionWithSingleOperation(s);
+            var resultOfOperaion = operation(expression);
+            
+            s = s.replace(expression, resultOfOperaion);
         }
 
         return +(+s).toFixed(2);
     }
 
-    function containsBrackects(s) {
-        if (s.search(/(\(|\))/) != -1) {
-            return true;
+    function getExpressionWithSingleOperation(s) {
+        var expression;
+
+        if (containsBrackects(s)) {
+            expression = getExpressionFromBrackects(s);
+        } else {
+            expression = getExpressionForOperation(s);
         }
 
-        return false;
+        return expression;
+    }
+
+
+    function containsBrackects(s) {
+        var containBrackets =  s.search(/(\(|\))/) != -1;
+
+        return containBrackets;
     }
 
     function isValid(s) {
         var isValid = true;
+        var containUnpermittedSymbols = s.search(/[^\+\-\*\/\(\)\.\d]/) !== -1;
+        var containMultipleOperationsSymbolsTogether = s.search(/[\+\-\*\/]{2,}/) !== -1;
 
-        if (s.search(/[^\+\-\*\/\(\).0-9]/) !== -1) {
+        if (containUnpermittedSymbols) {
             isValid = false;
-        } else if (s.search(/[\+\-\*\/]{2,}/) !== -1) {
+        } else if (containMultipleOperationsSymbolsTogether) {
             isValid = false;
         } else if (containsBrackects(s)) {
             var openBrackects = s.match(/\(/g) || [];
@@ -48,18 +56,18 @@ var parser = (function () {
     }
 
     function getExpressionFromBrackects(s) {
-        var fromBackets = s.match(/\(-?\d+(\.\d+)?([\+\-\*\/]*\d+(\.\d+)?)*\)/) || [];
-
+        var expressionsInBrackets = s.match(/\(-?\d+(\.\d+)?([\+\-\*\/]*\d+(\.\d+)?)*\)/) || [0];
+        var fromBackets = expressionsInBrackets[0];
 
         var containMultipleOperations = 
-            fromBackets[0].search(/\(-?\d+(\.\d+)?([\+\-\*\/]*\d+(\.\d+)?)?\)/) === -1;
+            fromBackets.search(/\(-?\d+(\.\d+)?([\+\-\*\/]*\d+(\.\d+)?)?\)/) === -1;
 
+        //if expression have multiple opearions return only expression with single opearion
         if (containMultipleOperations) {
-            return getExpressionForOperation(fromBackets[0]);
+            return getExpressionForOperation(fromBackets);
         }
 
-
-        return fromBackets[0];
+        return fromBackets;
     }
 
     function removeBrackets(s) {
@@ -73,17 +81,17 @@ var parser = (function () {
     }
 
     function getExpressionForOperation(s) {
+        //expressions with specific operaion sign
+        var multiplicationOrDivision = s.match(/\-?\d+\.?\d*[\*\/]\-?\d+\.?\d*/) || [];
+        var addition = s.match(/\-?\d+\.?\d*[\+]\-?\d+\.?\d*/) || [];
+        var subtraction = s.match(/\-?\d+\.?\d*[\-]\-?\d+\.?\d*/) || [];
 
-        var indexOfSign = s.match(/\-?\d+\.?\d*[\*\/]\-?\d+\.?\d*/) || [];
-        var indexOfPlus = s.match(/\-?\d+\.?\d*[\+]\-?\d+\.?\d*/) || [];
-        var indexOfMinus = s.match(/\-?\d+\.?\d*[\-]\-?\d+\.?\d*/) || [];
-
-        if (indexOfSign.length !== 0) {
-            return indexOfSign[0];
-        } else if (indexOfPlus.length !== 0) {
-            return indexOfPlus[0];
-        } else if (indexOfMinus !== 0) {
-            return indexOfMinus[0];
+        if (multiplicationOrDivision.length !== 0) {
+            return multiplicationOrDivision[0];
+        } else if (addition.length !== 0) {
+            return addition[0];
+        } else if (subtraction.length !== 0) {
+            return subtraction[0];
         }
 
         return s;
