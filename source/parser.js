@@ -14,8 +14,8 @@ var parser = (function () {
             } else {
                 expression = getExpressionForOperation(s);
             }
-            var signIndex = getSignIndex(expression);
-            s = s.replace(expression, operation(expression, signIndex));
+
+            s = s.replace(expression, operation(expression));
         }
 
         return +(+s).toFixed(2);
@@ -37,8 +37,8 @@ var parser = (function () {
         } else if (s.search(/[\+\-\*\/]{2,}/) !== -1) {
             isValid = false;
         } else if (containsBrackects(s)) {
-            var openBrackects = s.match(/\(/) || [];
-            var closeBrackects = s.match(/\)/) || [];
+            var openBrackects = s.match(/\(/g) || [];
+            var closeBrackects = s.match(/\)/g) || [];
             if (openBrackects.length != closeBrackects.length) {
                 isValid = false;
             }
@@ -48,11 +48,30 @@ var parser = (function () {
     }
 
     function getExpressionFromBrackects(s) {
-        var fromBackets = s.match(/\(-*\d+\.*\d*[\+\-\*\/]*\d+\.*\d*\)/);
+        var fromBackets = s.match(/\(-?\d+(\.\d+)?([\+\-\*\/]*\d+(\.\d+)?)*\)/) || [];
+
+
+        var containMultipleOperations = 
+            fromBackets[0].search(/\(-?\d+(\.\d+)?([\+\-\*\/]*\d+(\.\d+)?)?\)/) === -1;
+
+        if (containMultipleOperations) {
+            return getExpressionForOperation(fromBackets[0]);
+        }
+
+
         return fromBackets[0];
     }
 
-    //complicated function -__-
+    function removeBrackets(s) {
+        if (containsBrackects(s)) {
+            var start = s.lastIndexOf('(') + 1;
+            var end = s.indexOf(')');
+            return s.substring(start, end);
+        }
+        
+        return s;
+    }
+
     function getExpressionForOperation(s) {
 
         var indexOfSign = s.match(/\-?\d+\.?\d*[\*\/]\-?\d+\.?\d*/) || [];
@@ -70,8 +89,7 @@ var parser = (function () {
         return s;
     }
 
-    function getSignIndex(expression) {
-        
+    function getSignIndex(expression) {        
         var signs = ['*', '/', '+', '-'];
         for (var i = 0; i < signs.length; i++) {
             var signIndex = expression.lastIndexOf(signs[i]);
@@ -81,12 +99,11 @@ var parser = (function () {
         }
     }
 
-    function operation(expression, signIndex) { 
+    function operation(expression) {
+        expression = removeBrackets(expression);
+        var signIndex = getSignIndex(expression);
         var sign = expression[signIndex];
-        if (containsBrackects(expression)) {
-            expression = expression.substring(1, expression.length - 1);
-            signIndex = expression.lastIndexOf(sign);
-        }
+
         var x = +(expression.substring(0, signIndex));
         var y = +(expression.substring(signIndex + 1, expression.length));
         

@@ -92,7 +92,9 @@ describe ('parser spec', function() {
         it('should return 1 for 1+2/45/78/78', function() {
             should(parser.parse('1+2/45/78/78')).equal(1);
         });
+    });
 
+    describe('single number and brackets', function() {
         it('should return 0 for 0', function() {
             should(parser.parse('0')).equal(0);
         });
@@ -103,6 +105,26 @@ describe ('parser spec', function() {
 
         it('should return (-18) for -18', function() {
             should(parser.parse('(-18)')).equal(-18);
+        });
+
+        it('should return 9 for (((((((9)))))))', function() {
+            should(parser.parse('(((((((9)))))))')).equal(9);
+        });
+
+        it('should return 15 for (((5+10)))', function() {
+            should(parser.parse('(((5+10)))')).equal(15);
+        });
+
+        it('should return -52.52 for -1/2 + ((-5.5 - 4.7) * 5.1)', function() {
+            should(parser.parse('-1/2 + ((-5.5 - 4.7) * 5.1)')).equal(-52.52);
+        });
+
+        it('should return -54.57 for (-1/2 + (-5.5 - 4.7)) * 5.1', function() {
+            should(parser.parse('(-1/2 + (-5.5 - 4.7)) * 5.1')).equal(-54.57);
+        });
+
+        it('should return -62.52 for (-1/2 + (-5.5 - 4.7) * 5.1)- 10', function() {
+            should(parser.parse('(-1/2 + (-5.5 - 4.7) * 5.1)- 10')).equal(-62.52);
         });
     });
 
