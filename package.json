@@ -1,8 +1,14 @@
 {
   "name": "parser",
   "version": "1.0.0",
-  "description": "",
-  "main": "index.js",
+  "description": "Math expression parser (TDD)",
+  "main": "parser.js",
+  "dependencies": {
+    "should": "~3.0.1"
+  },
+  "devDependencies": {
+    "mocha": "~1.17.0"
+  },
   "scripts": {
     "test": "mocha"
   },
